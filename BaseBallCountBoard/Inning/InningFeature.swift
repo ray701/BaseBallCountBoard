@@ -117,7 +117,8 @@ struct InningFeature: Reducer {
             }
 
             func restore() -> State? {
-                stack.removeLast()
+                guard !stack.isEmpty else { return nil }
+                return stack.removeLast()
             }
         }
     }
