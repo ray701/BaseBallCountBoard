@@ -27,7 +27,8 @@ struct AppButton: View {
             action()
         } label: {
             Text(text)
-                .font(.largeTitle)
+                .font(.title)
+                .bold()
                 .foregroundColor(.white)
                 .padding()
                 .background(

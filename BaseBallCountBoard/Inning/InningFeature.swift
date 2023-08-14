@@ -104,6 +104,22 @@ struct InningFeature: Reducer {
                 return .init(count: count)
             }
         }
+
+        class StateStackContainer {
+            static let shard: StateStackContainer = .init()
+            private var stack: [State] = []
+            private init(stack: [State] = []) {
+                self.stack = stack
+            }
+
+            func save(_ state: State) {
+                stack.append(state)
+            }
+
+            func restore() -> State? {
+                stack.removeLast()
+            }
+        }
     }
 
     enum Action {
@@ -112,17 +128,20 @@ struct InningFeature: Reducer {
         case batterOutButtonTapped
         case runnerOutButtonTapped
         case foulButtonTapped
+        case undoButtonTapped
     }
 
     func reduce(into state: inout State, action: Action) -> ComposableArchitecture.Effect<Action> {
         switch action {
         case .ballButtonTapped:
+            InningFeature.State.StateStackContainer.shard.save(state)
             state.ball = state.ball.increment()
 
             if state.ball.count == 0 {
                 state.strike = State.Strike.reset()
             }
         case .strikeButtonTapped:
+            InningFeature.State.StateStackContainer.shard.save(state)
             state.strike = state.strike.increment()
 
             if state.strike.count == 0 {
@@ -130,6 +149,7 @@ struct InningFeature: Reducer {
                 state.out = state.out.increment()
             }
         case .batterOutButtonTapped:
+            InningFeature.State.StateStackContainer.shard.save(state)
             state.out = state.out.increment()
             state.ball = State.Ball.reset()
             state.strike = State.Strike.reset()
@@ -138,6 +158,7 @@ struct InningFeature: Reducer {
                 state.inningType = state.inningType.toggle()
             }
         case .runnerOutButtonTapped:
+            InningFeature.State.StateStackContainer.shard.save(state)
             state.out = state.out.increment()
 
             if state.out.count == 0 {
@@ -147,8 +168,12 @@ struct InningFeature: Reducer {
             }
         case .foulButtonTapped:
             if state.strike.count < state.strike.maxCount {
+                InningFeature.State.StateStackContainer.shard.save(state)
                 state.strike = state.strike.increment()
             }
+        case .undoButtonTapped:
+            guard let _state = InningFeature.State.StateStackContainer.shard.restore() else { return .none }
+            state = _state
         }
 
         return .none

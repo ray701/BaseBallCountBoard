@@ -11,18 +11,17 @@ struct ContentView: View {
     let store: StoreOf<InningFeature>
 
     var body: some View {
-        WithViewStore(self.store) {
-            $0
-        } content: { viewStore in
-
+        WithViewStore(store, observe: { $0 }) {  viewStore in
             VStack {
-                VStack(alignment: .leading) {
+                VStack(alignment: .leading, spacing: 10) {
                     CountView(type: viewStore.ball)
                     CountView(type: viewStore.strike)
                     CountView(type: viewStore.out)
                 }
                 .padding()
+                .frame(maxWidth: .infinity)
                 .background(Color(R.color.boardBackGround()!))
+                .cornerRadius(15)
 
                 buttonAreaView(viewStore)
             }
@@ -67,6 +66,13 @@ struct ContentView: View {
                 color: Color(R.color.strikeCount()!)
             ) {
                 viewStore.send(.foulButtonTapped)
+            }
+
+            AppButton(
+                text: "U",
+                color: .brown
+            ) {
+                viewStore.send(.undoButtonTapped)
             }
         }
     }

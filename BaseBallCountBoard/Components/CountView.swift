@@ -26,8 +26,8 @@ struct CountView: View {
         HStack {
             Text(type.displayText)
                 .font(.largeTitle)
-                .padding()
-                .frame(width: 60, height: 60)
+                .bold()
+                .frame(width: 44, height: 44)
 
             ForEach(0..<type.maxCount, id: \.self) { i in
                 let color = i < type.count ? color : Color(R.color.emptyCount()!)
@@ -35,6 +35,8 @@ struct CountView: View {
                     .fill(color)
                     .frame(width: 44, height: 44)
             }
+            Spacer()
+                .frame(width: 8)
         }
     }
 }
