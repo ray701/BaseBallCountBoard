@@ -10,12 +10,17 @@ import SwiftUI
 @main
 struct BaseBallCountBoardApp: App {
     static let store = Store(
-        initialState: InningFeature.State(),
-        reducer: { InningFeature() }
+        initialState: Root.State(),
+        reducer: { Root().signpost()._printChanges() }
     )
     var body: some Scene {
         WindowGroup {
-            ContentView(store: BaseBallCountBoardApp.store)
+            ContentView(
+                store: Self.store.scope(
+                    state: \.inning,
+                    action: Root.Action.inningFeature
+                )
+            )
         }
     }
 }
